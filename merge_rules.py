@@ -200,6 +200,15 @@ def parse_command_line(program_info):
         default = program_info['replace_alphas_only']
     )
 
+    parser.add_argument(
+        '--rules_dir',
+        '-D',
+        help = 'Path to the Rules folder',
+        required = False,
+        action='store',
+        default = os.path.join('..', 'pcfg_cracker', 'Rules')
+    )
+
     args=parser.parse_args()
 
     # Standard Options
@@ -208,6 +217,7 @@ def parse_command_line(program_info):
     program_info['output'] = args.output
     program_info['weight'] = float(args.weight)
     program_info['replace_alphas_only'] = args.replace_alphas_only
+    program_info['rules_dir'] = args.rules_dir
 
     return True
 
@@ -236,13 +246,9 @@ def main():
     weight = program_info['weight']
     replace_alphas_only = program_info['replace_alphas_only']
 
-    base_directory = os.path.join(
-                        os.path.dirname(os.path.realpath(__file__)),
-                        'Rules',
-                        )
-    generic_rule_dir = os.path.join(base_directory, program_info['rule'])
-    input_rule_dir = os.path.join(base_directory, program_info['input'])
-    output_rule_dir = os.path.join(base_directory, program_info['output'])
+    generic_rule_dir = os.path.join(program_info['rules_dir'], program_info['rule'])
+    input_rule_dir = os.path.join(program_info['rules_dir'], program_info['input'])
+    output_rule_dir = os.path.join(program_info['rules_dir'], program_info['output'])
 
     if os.path.exists(output_rule_dir):
         print(f'{output_rule_dir} already exists, exiting')
