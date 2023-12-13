@@ -97,7 +97,7 @@ def _merge_files(generic_rule_dir, input_rule_dir, output_rule_dir, directory, g
 
 
 def merge_rules(generic_rule_dir, input_rule_dir, output_rule_dir, 
-                weight, config_file_name = 'config.ini', replace_alphas_only = False):
+                weight, config_file_name = 'config.ini', replace_alphas_only = False, merge_base_only = False):
     # Create the config objects
     generic_config = configparser.ConfigParser()
     with open(os.path.join(generic_rule_dir, config_file_name), encoding=DEFAULT_ENCODING) as fp:
@@ -136,6 +136,11 @@ def merge_rules(generic_rule_dir, input_rule_dir, output_rule_dir,
             if section == 'BASE_A' and replace_alphas_only is True:
                 generic_files = []
             elif replace_alphas_only is True:
+                input_files = []
+
+            # If the merge_base_only switch is set, we will merge the base structures
+            # Thus not using the grammars and capitalization.
+            if (section == 'START' and merge_base_only) or (section == 'CAPITALIZATION' and merge_base_only):
                 input_files = []
 
             # Merging filenames variable in config
@@ -193,11 +198,20 @@ def parse_command_line(program_info):
 
     parser.add_argument(
         '--replace_alphas_only',
-        help = 'Only merge the alpha structures from input. Keeping everything of generic rule set as is.',
+        help = 'Only use the alphas from the input rule set. Keeping everything else of generic rule set as is.',
         required = False,
         action='store_const',
         const= not program_info['replace_alphas_only'],
         default = program_info['replace_alphas_only']
+    )
+
+    parser.add_argument(
+        '--merge_base_only',
+        help = 'Only merge the base structures from input. Keeping grammars and captalization as is.',
+        required = False,
+        action='store_const',
+        const= not program_info['merge_base_only'],
+        default = program_info['merge_base_only']
     )
 
     parser.add_argument(
@@ -217,6 +231,7 @@ def parse_command_line(program_info):
     program_info['output'] = args.output
     program_info['weight'] = float(args.weight)
     program_info['replace_alphas_only'] = args.replace_alphas_only
+    program_info['merge_base_only'] = args.merge_base_only
     program_info['rules_dir'] = args.rules_dir
 
     return True
@@ -230,8 +245,8 @@ def main():
         'name':'PCFG Merge Rules',
         'version': '1.0',
 
-        # Merge alphas only
         'replace_alphas_only': False,
+        'merge_base_only': False
     }
 
     print('PCFG Merge Rules')
@@ -245,6 +260,11 @@ def main():
 
     weight = program_info['weight']
     replace_alphas_only = program_info['replace_alphas_only']
+    merge_base_only = program_info['merge_base_only']
+
+    if replace_alphas_only and merge_base_only:
+        print('Both replace_alphas_only and merge_base_only are set. Please select one option.')
+        return
 
     generic_rule_dir = os.path.join(program_info['rules_dir'], program_info['rule'])
     input_rule_dir = os.path.join(program_info['rules_dir'], program_info['input'])
@@ -256,7 +276,7 @@ def main():
     
     os.mkdir(output_rule_dir)
 
-    if not merge_rules(generic_rule_dir, input_rule_dir, output_rule_dir, weight, replace_alphas_only = replace_alphas_only):
+    if not merge_rules(generic_rule_dir, input_rule_dir, output_rule_dir, weight, replace_alphas_only = replace_alphas_only, merge_base_only = merge_base_only):
         print('Merging rules failed exiting')
         return
     
