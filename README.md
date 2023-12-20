@@ -27,3 +27,19 @@ Optional arguments:
 
 ### Credits
 This tool is based on other scientific research. And is only usefull with [pcfg_cracker](https://github.com/lakiw/pcfg_cracker) created by Matt Weir.
+
+## get_structures.py
+A tool that can be used to build wordlists from pre-trainer rule sets. Simply specify the rule set and tell the script what you need. The script will simply go in to the `Alpha` folder (when `alpha` is enable), loop over the files in there, and only get the alphas without the probability.
+
+### Requirements
+🐍 Python 3.x
+
+### Usage
+Run the script from the command line with the necessary arguments. Here is the basic syntax:
+```
+python keepyour.py --rule [RULE] [--alpha] --min_length [MIN_LENGTH] --max_length [MAX_LENGTH]
+```
+ * `RULE`: Name of the rule.
+ * `alpha`: set to true if you want to only get the alpha strings
+ * `MIN_LENGTH`: minimal length of the structure go get from the rule
+ * `MAX_LENGTH`: maximal length of the structure go get from the rule
